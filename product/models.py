@@ -5,7 +5,7 @@ from user.models import Profile
 
 
 
-class product(models.Model):
+class Product(models.Model):
     condition_types = [
         (1, "New"),
         (2, "Used"),
@@ -31,5 +31,19 @@ class product(models.Model):
 
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now_add=True) 
+
+    def __str__(self):
+        return self.title
+
     
 # Create your models here.
+
+class ProductView(models.Model):
+    product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    view_count = models.IntegerField(default=0)
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='media/')
+    is_main = models.BooleanField(default=False)

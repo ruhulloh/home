@@ -1,11 +1,29 @@
 from django.shortcuts import render
-from category.models import Category
-from product.models import product, productimage
+from django.db.models import Prefetch
+from category.models import Category, Region
+from product.models import Product, ProductImage
 
+def main(request):
+    # Barcha kategoriyalarni olish
+    
 
-# Create your views here.
-def home(request):
-    bull = Category.objects.all()
-    context = {"ctg":bull}
-    return render(request, 'index-2.html', context)
+    # Asosiy kategoriyalarni olish
+    categories = Category.objects.filter(is_main=True)
 
+    # Asosiy rasmlar bilan birga mahsulotlarni olish
+    products = Product.objects.prefetch_related(
+        Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_images')
+    )
+    region = Region.objects.all()
+
+    print(products)
+
+    # Kontekstni shakllantirish
+    ctx = {
+        "categories": categories,
+        "products": products,
+        "regions": region,
+        
+    }
+
+    return render(request, 'index-2.html', ctx)
